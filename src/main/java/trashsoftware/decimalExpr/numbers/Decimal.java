@@ -119,6 +119,11 @@ public class Decimal extends Real {
     }
 
     @Override
+    public Number pow(int exp) {
+        return createDecimal(value.pow(exp));
+    }
+
+    @Override
     public Real neg() {
         return createDecimal(value.negate());
     }

@@ -5,6 +5,7 @@ import trashsoftware.decimalExpr.DecimalExpr;
 import trashsoftware.decimalExpr.expression.BinaryOperator;
 import trashsoftware.decimalExpr.expression.Function;
 import trashsoftware.decimalExpr.expression.UnaryOperator;
+import trashsoftware.decimalExpr.util.Utilities;
 
 public class Parser {
 

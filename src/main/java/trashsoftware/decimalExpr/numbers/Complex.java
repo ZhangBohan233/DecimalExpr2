@@ -1,5 +1,7 @@
 package trashsoftware.decimalExpr.numbers;
 
+import trashsoftware.decimalExpr.util.Calculations;
+
 import java.util.Objects;
 
 public class Complex implements Number {
@@ -99,6 +101,11 @@ public class Complex implements Number {
         throw new ArithmeticException("Only integer power of complex is supported. ");
     }
 
+    @Override
+    public Number pow(int exp) {
+        return complexPowIntLoop(exp);
+    }
+
     /**
      * Returns the square root of this complex number.
      * <p>
@@ -157,13 +164,63 @@ public class Complex implements Number {
         return Complex.createComplex((Real) realPartNum.div(denom), (Real) imPartNum.div(denom));
     }
 
-    private Number complexPowIntLoop(int exp) {
+    /**
+     * Integer power of complex, using naive algorithm.
+     *
+     * @param exp the integer exponential
+     * @return the complex power
+     */
+    Number complexPowIntLoop(int exp) {
         if (exp == 0) return Rational.ONE;
         int posExp = exp > 0 ? exp : -exp;
         Number res = this;
         for (int i = 1; i < posExp; i++) {
             res = res.mul(this);
         }
+        return exp > 0 ? res : Rational.ONE.div(res);
+    }
+
+    /**
+     * Integer power of complex, using binomial theorem.
+     * <p>
+     * This algorithm is faster than direct power, but the double version might not be accurate when exp is large.
+     *
+     * @param exp the integer exponential
+     * @return the complex power
+     */
+    Number complexPowerIntBinomial(int exp) {
+        if (exp == 0) return Rational.ONE;
+        int n = exp > 0 ? exp : -exp;
+
+        Number realPart = Rational.ZERO;
+        Number imPart = Rational.ZERO;
+
+        for (int r = 0; r <= n; r++) {
+            long comb = (long) Calculations.combination(n, r);
+            Rational combR = Rational.valueOf(comb);
+            Number aPow = real.pow(n - r);
+            Number bPow = imaginary.pow(r);
+            Number mulRes = combR.mul(aPow).mul(bPow);
+//            System.out.println(aPow + " " + bPow + " " + combR);
+
+            int rMod4 = r % 4;  // i^(4k) = 1, i^(4k+1) = i, i^(4k+2) = -1, i^(4k+3) = -i
+            switch (rMod4) {
+                case 0:
+                    realPart = realPart.add(mulRes);
+                    break;
+                case 1:
+                    imPart = imPart.add(mulRes);
+                    break;
+                case 2:
+                    realPart = realPart.sub(mulRes);
+                    break;
+                default:
+                    imPart = imPart.sub(mulRes);
+                    break;
+            }
+        }
+
+        Number res = createComplex((Real) realPart, (Real) imPart);
         return exp > 0 ? res : Rational.ONE.div(res);
     }
 }

@@ -35,6 +35,11 @@ public enum Infinity implements Number {
     }
 
     @Override
+    public Number pow(int exp) {
+        return exp == 0 ? Rational.ONE : this;
+    }
+
+    @Override
     public Number sqrt() {
         return this;
     }

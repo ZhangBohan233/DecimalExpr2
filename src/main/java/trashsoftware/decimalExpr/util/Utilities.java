@@ -1,4 +1,4 @@
-package trashsoftware.decimalExpr.builder;
+package trashsoftware.decimalExpr.util;
 
 import java.util.Arrays;
 

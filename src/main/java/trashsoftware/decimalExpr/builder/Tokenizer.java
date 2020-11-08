@@ -1,5 +1,7 @@
 package trashsoftware.decimalExpr.builder;
 
+import trashsoftware.decimalExpr.util.Utilities;
+
 import java.util.ArrayList;
 import java.util.List;
 

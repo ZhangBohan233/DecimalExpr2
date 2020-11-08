@@ -229,9 +229,14 @@ public class Rational extends Real {
     public Number pow(Number exp) {
         if (exp instanceof Rational) {
             Rational r = (Rational) exp;
-            if (r.isInt()) return integerPower(r.numerator.intValue());
+            if (r.isInt()) return pow(r.numerator.intValue());
         }
         return null;
+    }
+
+    @Override
+    public Number pow(int exp) {
+        return integerPower(exp);
     }
 
     @Override
@@ -253,6 +258,16 @@ public class Rational extends Real {
     public int signum() {
         return numerator.signum();
     }
+
+//    @Override
+//    public int compareTo(Real o) {
+//        if (o instanceof Rational) {
+//            Rational diff = subtractRational((Rational) o);
+//            return diff.signum();
+//        } else {
+//            return bigDecimalValue().compareTo(o.bigDecimalValue());
+//        }
+//    }
 
     @Override
     public String toString() {

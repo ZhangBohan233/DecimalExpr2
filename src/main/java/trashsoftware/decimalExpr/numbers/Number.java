@@ -23,5 +23,7 @@ public interface Number {
 
     Number pow(Number exp);
 
+    Number pow(int exp);
+
     Number sqrt();
 }
