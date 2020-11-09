@@ -1,14 +1,13 @@
 package trashsoftware.decimalExpr.builder;
 
-import trashsoftware.decimalExpr.expression.BinaryOperator;
-import trashsoftware.decimalExpr.expression.Function;
-import trashsoftware.decimalExpr.expression.UnaryOperator;
-import trashsoftware.decimalExpr.expression.Values;
+import trashsoftware.decimalExpr.BuildException;
+import trashsoftware.decimalExpr.expression.*;
 import trashsoftware.decimalExpr.numbers.Number;
 import trashsoftware.decimalExpr.numbers.Rational;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class Node {
@@ -134,16 +133,11 @@ public abstract class Node {
         }
     }
 
-    static class VarNameNode extends LeafExpr {
+    abstract static class NameNode extends LeafExpr {
         final String name;
 
-        VarNameNode(String name) {
+        NameNode(String name) {
             this.name = name;
-        }
-
-        @Override
-        public Number eval(Values values) {
-            return values.getVariable(name);
         }
 
         @Override
@@ -152,21 +146,36 @@ public abstract class Node {
         }
     }
 
-    static class MacroNameNode extends LeafExpr {
-        final String name;
-
-        MacroNameNode(String name) {
-            this.name = name;
+    static class VarNameNode extends NameNode {
+        VarNameNode(String name) {
+            super(name);
         }
 
         @Override
         public Number eval(Values values) {
-            return values.getMacro(name).getRoot().eval(values);
+            return values.getVariable(name);
+        }
+    }
+
+    static class MacroNameNode extends NameNode {
+        MacroNameNode(String name) {
+            super(name);
         }
 
         @Override
-        public String toString() {
-            return name;
+        public Number eval(Values values) {
+            return values.getMacro(name).eval(values);
+        }
+    }
+
+    static class UndefinedNameNode extends NameNode {
+        UndefinedNameNode(String name) {
+            super(name);
+        }
+
+        @Override
+        public Number eval(Values values) {
+            throw new BuildException("Unexpected token " + name + ".");
         }
     }
 
@@ -220,6 +229,44 @@ public abstract class Node {
             Number[] res = new Number[args.size()];
             for (int i = 0; i < res.length; i++) {
                 res[i] = args.get(i).eval(values);
+            }
+            return res;
+        }
+
+        @Override
+        public String toString() {
+            return function.name + "(" + args + ")";
+        }
+    }
+
+    static class MacroFunctionCall extends Expression {
+        final MacroFunction function;
+        final BlockStmt args;
+
+        MacroFunctionCall(MacroFunction function, BlockStmt args) {
+            this.function = function;
+            this.args = args;
+        }
+
+        @Override
+        public Number eval(Values values) {
+            Node invariantNode = args.get(0);
+            if (!(invariantNode instanceof NameNode)) {
+                throw new BuildException("Invariant must be name, got " + invariantNode.getClass().getName());
+            }
+            String name = ((NameNode) invariantNode).name;
+
+            Node macroNode = args.get(1);
+            Macro macro = new Macro(macroNode);
+
+            Number[] args = evalArgs(values);
+            return function.eval(values, name, macro, args);
+        }
+
+        private Number[] evalArgs(Values values) {
+            Number[] res = new Number[args.size() - 2];
+            for (int i = 0; i < res.length; i++) {
+                res[i] = args.get(i + 2).eval(values);
             }
             return res;
         }

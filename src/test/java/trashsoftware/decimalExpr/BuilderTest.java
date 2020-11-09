@@ -2,8 +2,12 @@ package trashsoftware.decimalExpr;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import trashsoftware.decimalExpr.expression.BinaryOperator;
+import trashsoftware.decimalExpr.expression.Operator;
 import trashsoftware.decimalExpr.numbers.Number;
 import trashsoftware.decimalExpr.numbers.Rational;
+
+import java.util.Objects;
 
 public class BuilderTest {
 
@@ -52,7 +56,7 @@ public class BuilderTest {
         decimalExpr.setVariable("x", 4);
         decimalExpr.setMacro("m", "x+1");
         Number res = decimalExpr.evaluate();
-        System.out.println(res);
+        Assertions.assertEquals(res, Rational.valueOf(11));
     }
 
     @Test
@@ -86,5 +90,44 @@ public class BuilderTest {
         decimalExpr.setVariable("x", -7);
         Number res = decimalExpr.evaluate();
         Assertions.assertEquals(res, Rational.valueOf(9));
+    }
+
+    @Test
+    void overrideOperator() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("2+5")
+                .operator(new BinaryOperator("+", Operator.PRECEDENCE_ADDITION) {
+                    @Override
+                    public Number eval(Number left, Number right) {
+                        return left.mul(right).add(Rational.ONE);
+                    }
+                })
+                .build();
+        Assertions.assertEquals(decimalExpr.evaluate(), Rational.valueOf(11));
+    }
+
+    @Test
+    void testMacroFunction() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("sum(i, 2i, 0, 10)")
+                .showAst()
+                .showTokens()
+                .build();
+        Number res = decimalExpr.evaluate();
+        Assertions.assertEquals(res, Rational.valueOf(110));
+    }
+
+    @Test
+    void testMacroFunctionWithVar() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("sum(i, 2i x, 0, 10)")
+                .showAst()
+                .showTokens()
+                .variable("x")
+                .build();
+        decimalExpr.setVariable("x", 2);
+        Number res = decimalExpr.evaluate();
+        System.out.println(res);
+        Assertions.assertEquals(res, Rational.valueOf(220));
     }
 }

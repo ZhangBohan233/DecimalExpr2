@@ -2,16 +2,10 @@ package trashsoftware.decimalExpr.expression;
 
 import trashsoftware.decimalExpr.numbers.Number;
 
-public abstract class Function {
-
-    public final String name;
-    private final int minArgCount;
-    private final int maxArgCount;
+public abstract class Function extends AbstractFunction {
 
     public Function(String name, int minArgCount, int maxArgCount) {
-        this.name = name;
-        this.minArgCount = minArgCount;
-        this.maxArgCount = maxArgCount;
+        super(name, minArgCount, maxArgCount);
     }
 
     public Function(String name, int argCount) {

@@ -2,9 +2,7 @@ package trashsoftware.decimalExpr.builder;
 
 import trashsoftware.decimalExpr.BuildException;
 import trashsoftware.decimalExpr.DecimalExpr;
-import trashsoftware.decimalExpr.expression.BinaryOperator;
-import trashsoftware.decimalExpr.expression.Function;
-import trashsoftware.decimalExpr.expression.UnaryOperator;
+import trashsoftware.decimalExpr.expression.*;
 import trashsoftware.decimalExpr.util.Utilities;
 
 public class Parser {
@@ -61,8 +59,10 @@ public class Parser {
                     astBuilder.addNode(new Node.MacroNameNode(identifier));
                 } else if (decimalExpr.getFunctions().containsKey(identifier)) {
                     //
+                } else if (identifier.equals(",")) {
+                    astBuilder.finishLine();
                 } else {
-                    throw new BuildException("Unexpected token " + token + ".");
+                    astBuilder.addNode(new Node.UndefinedNameNode(identifier));
                 }
             } else if (token instanceof Token.IntToken) {
                 astBuilder.addNode(new Node.IntNode(((Token.IntToken) token).literal));
@@ -81,10 +81,15 @@ public class Parser {
                     if (probCall instanceof Element.AtomicElement &&
                             ((Element.AtomicElement) probCall).token instanceof Token.IdToken) {
                         String identifier = ((Token.IdToken) ((Element.AtomicElement) probCall).token).identifier;
-                        Function function = decimalExpr.getFunctions().get(identifier);
+                        AbstractFunction function = decimalExpr.getFunctions().get(identifier);
                         if (function != null) {
                             Node.BlockStmt args = parseMultiParts(ce);
-                            astBuilder.addNode(new Node.FunctionCall(function, args));
+                            if (function instanceof Function)
+                                astBuilder.addNode(new Node.FunctionCall((Function) function, args));
+                            else if (function instanceof MacroFunction)
+                                astBuilder.addNode(new Node.MacroFunctionCall((MacroFunction) function, args));
+                            else
+                                throw new BuildException("Unexpected function type");
                             return index;
                         }
                     }

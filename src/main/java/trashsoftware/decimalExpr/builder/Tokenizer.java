@@ -15,7 +15,7 @@ public class Tokenizer {
 
     public static final String[] EXTRA_IDENTIFIERS = ALLOWED_OPERATORS;
 
-    public static final String[] OTHERS = {"(", ")", "[", "]", "{", "}"};
+    public static final String[] OTHERS = {"(", ")", "[", "]", "{", "}", ","};
 
 //    public static final String IMAGINARY = "i";
 

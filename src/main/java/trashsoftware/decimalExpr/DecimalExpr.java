@@ -1,9 +1,6 @@
 package trashsoftware.decimalExpr;
 
-import trashsoftware.decimalExpr.builder.Element;
-import trashsoftware.decimalExpr.builder.Node;
-import trashsoftware.decimalExpr.builder.Parser;
-import trashsoftware.decimalExpr.builder.Tokenizer;
+import trashsoftware.decimalExpr.builder.*;
 import trashsoftware.decimalExpr.expression.*;
 import trashsoftware.decimalExpr.numbers.Complex;
 import trashsoftware.decimalExpr.numbers.Number;
@@ -28,9 +25,10 @@ public class DecimalExpr {
             "-", Operators.NEG
     );
 
-    public static final Map<String, Function> BUILTIN_FUNCTIONS = Map.of(
+    public static final Map<String, AbstractFunction> BUILTIN_FUNCTIONS = Map.of(
             "abs", Functions.ABS,
-            "sqrt", Functions.SQRT
+            "sqrt", Functions.SQRT,
+            "sum", Functions.SUM
     );
 
     /**
@@ -38,7 +36,7 @@ public class DecimalExpr {
      */
     private final Map<String, UnaryOperator> unaryOperators;
     private final Map<String, BinaryOperator> binaryOperators;
-    private final Map<String, Function> functions;
+    private final Map<String, AbstractFunction> functions;
     private final Values values;
     private Node.BlockStmt root;
 
@@ -60,7 +58,7 @@ public class DecimalExpr {
         unaryOperators.putAll(BUILTIN_UNARY_OPS);
         functions.putAll(BUILTIN_FUNCTIONS);
 
-        values.putVariable("i", Complex.I);
+        values.setVariable("i", Complex.I);
     }
 
     private DecimalExpr(DecimalExpr parent) {
@@ -82,7 +80,7 @@ public class DecimalExpr {
         return unaryOperators;
     }
 
-    public Map<String, Function> getFunctions() {
+    public Map<String, AbstractFunction> getFunctions() {
         return functions;
     }
 
@@ -100,7 +98,7 @@ public class DecimalExpr {
 
     public void setVariable(String varName, Number value) {
         if (values.hasVariable(varName)) {
-            values.putVariable(varName, value);
+            values.setVariable(varName, value);
         } else {
             throw new BuildException("Unknown variable '" + varName + "'");
         }
@@ -117,7 +115,7 @@ public class DecimalExpr {
             DecimalExpr subExpr = subBuilder.build();
             Macro macro = new Macro(subExpr.root);
 
-            values.putMacro(macroName, macro);
+            values.setMacro(macroName, macro);
         } else {
             throw new BuildException("Unknown macro name '" + macroName + "'");
         }
@@ -148,7 +146,7 @@ public class DecimalExpr {
         }
 
         public Builder variable(String var) {
-            decimalExpr.values.putVariable(var, null);
+            decimalExpr.values.setVariable(var, null);
             return this;
         }
 
@@ -187,7 +185,7 @@ public class DecimalExpr {
         }
 
         public Builder macro(String macroName) {
-            decimalExpr.values.putMacro(macroName, null);
+            decimalExpr.values.setMacro(macroName, null);
             return this;
         }
 

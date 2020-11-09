@@ -30,4 +30,23 @@ public class Functions {
             return arguments[0].sqrt();
         }
     };
+
+    // Macro functions
+
+    public static final MacroFunction SUM = new MacroFunction("sum", 2) {
+        @Override
+        protected Number evaluate(String invariant, Macro macro, Number... arguments) {
+            Number cur = arguments[0];
+            Number stop = arguments[1];
+            Number sum = Rational.ZERO;
+
+            while (true) {
+                setValue(invariant, cur);
+                sum = sum.add(evalMacro(macro));
+                if (cur.equals(stop)) break;
+                cur = cur.add(Rational.ONE);
+            }
+            return sum;
+        }
+    };
 }
