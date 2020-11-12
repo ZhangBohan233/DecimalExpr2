@@ -1,5 +1,6 @@
 package trashsoftware.decimalExpr.builder;
 
+import trashsoftware.decimalExpr.BuildException;
 import trashsoftware.decimalExpr.expression.Macro;
 import trashsoftware.decimalExpr.expression.UnknownSymbolException;
 import trashsoftware.decimalExpr.numbers.Number;
@@ -8,38 +9,34 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class Values {
+public abstract class Values {
 
-    private final Map<String, Number> variables = new HashMap<>();
-    private final Map<String, Macro> macros = new HashMap<>();
-    private final Values outer;
-
-    public Values(Values outer) {
-        this.outer = outer;
-    }
+    protected final Map<String, Number> variables = new HashMap<>();
+    protected final Map<String, Macro> macros = new HashMap<>();
 
     public Values() {
-        this(null);
     }
 
     public Number getVariable(String name) {
-        Number n = variables.get(name);
-        if (n == null) {
-            if (outer == null)
-                throw new UnknownSymbolException("Variable '" + name + "' not set.");
-            else return outer.getVariable(name);
-        }
-        return n;
+        Number value = innerGetVariable(name);
+        if (value == null) throw new UnknownSymbolException("Variable '" + name + "' not set.");
+        return value;
     }
 
     public Macro getMacro(String name) {
-        Macro macro = macros.get(name);
-        if (macro == null)
-            if (outer == null)
-                throw new UnknownSymbolException("Macro '" + name + "' not set.");
-            else return outer.getMacro(name);
+        Macro macro = innerGetMacro(name);
+        if (macro == null) throw new UnknownSymbolException("Macro '" + name + "' not set.");
         return macro;
     }
+
+//    public Macro getMacro(String name) {
+//        Macro macro = macros.get(name);
+//        if (macro == null)
+//            if (outer == null)
+//                throw new UnknownSymbolException("Macro '" + name + "' not set.");
+//            else return outer.getMacro(name);
+//        return macro;
+//    }
 
     public void setVariable(String name, Number value) {
         variables.put(name, value);
@@ -65,12 +62,75 @@ public class Values {
         return macros.containsKey(macroName);
     }
 
+    protected abstract Macro innerGetMacro(String name);
+
+    protected abstract Number innerGetVariable(String name);
+
+    public abstract boolean isApproxRational();
+
+    public abstract void setApproxRational(boolean approxRational);
+
     @Override
     public String toString() {
-        return "Values{" +
+        return getClass().getName() + "{" +
                 "variables=" + variables +
                 ", macros=" + macros +
-                ", outer=" + outer +
                 '}';
+    }
+
+    public static class GlobalValues extends Values {
+        private boolean approxRational;
+
+        @Override
+        protected Macro innerGetMacro(String name) {
+            return macros.get(name);
+        }
+
+        @Override
+        protected Number innerGetVariable(String name) {
+            return variables.get(name);
+        }
+
+        @Override
+        public boolean isApproxRational() {
+            return approxRational;
+        }
+
+        @Override
+        public void setApproxRational(boolean approxRational) {
+            this.approxRational = approxRational;
+        }
+    }
+
+    public static class MacroValues extends Values {
+        private final Values outer;
+
+        public MacroValues(Values outer) {
+            this.outer = outer;
+        }
+
+        @Override
+        protected Macro innerGetMacro(String name) {
+            Macro local = macros.get(name);
+            if (local == null) return outer.innerGetMacro(name);
+            return local;
+        }
+
+        @Override
+        protected Number innerGetVariable(String name) {
+            Number local = variables.get(name);
+            if (local == null) return outer.innerGetVariable(name);
+            return local;
+        }
+
+        @Override
+        public boolean isApproxRational() {
+            return outer.isApproxRational();
+        }
+
+        @Override
+        public void setApproxRational(boolean approxRational) {
+            throw new BuildException("Cannot set global pref from macro.");
+        }
     }
 }

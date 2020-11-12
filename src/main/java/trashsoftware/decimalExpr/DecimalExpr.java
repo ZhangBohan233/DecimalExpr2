@@ -52,7 +52,7 @@ public class DecimalExpr {
         binaryOperators = new HashMap<>();
         functions = new HashMap<>();
 
-        values = new Values();
+        values = new Values.GlobalValues();
 
         binaryOperators.putAll(BUILTIN_BINARY_OPS);
         unaryOperators.putAll(BUILTIN_UNARY_OPS);
@@ -66,7 +66,7 @@ public class DecimalExpr {
         binaryOperators = parent.binaryOperators;
         functions = parent.functions;
 
-        values = parent.values;
+        values = new Values.MacroValues(parent.values);
 
         approxRational = parent.approxRational;
         root = null;
@@ -189,8 +189,19 @@ public class DecimalExpr {
             return this;
         }
 
+        /**
+         * Whether to convert decimal input to rational.
+         * <p>
+         * For example, when set to {@code true}, the expression "2.5" will be evaluate to 5/2.
+         * Otherwise, it is a decimal number 2.5
+         * Set this to {@code true} also enables recurring number approximation.
+         * For example, "0.{142857}" will be evaluate to 1/7
+         *
+         * @param approxRational whether to convert decimal input to rational
+         * @return builder itself
+         */
         public Builder approxRational(boolean approxRational) {
-            decimalExpr.approxRational = approxRational;
+            decimalExpr.values.setApproxRational(approxRational);
             return this;
         }
 

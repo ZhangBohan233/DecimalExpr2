@@ -23,7 +23,7 @@ public abstract class MacroFunction extends AbstractFunction {
                             String.valueOf(maxArgCount) : String.format("%d to %d", minArgCount, maxArgCount)),
                     arguments.length));
         }
-        subValues = new Values(outerEnv);
+        subValues = new Values.MacroValues(outerEnv);
         return evaluate(invariant, macro, arguments);
     }
 

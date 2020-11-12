@@ -101,4 +101,10 @@ public class NumbersTest {
         System.out.println(t2 - t1);
         System.out.println(t3 - t2);
     }
+
+    @Test
+    void testRationalRecurring() {
+        Number a = Rational.fromDecimalString("0.{142857}");
+        System.out.println(a);
+    }
 }

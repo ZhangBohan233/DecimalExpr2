@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import trashsoftware.decimalExpr.expression.BinaryOperator;
 import trashsoftware.decimalExpr.expression.Operator;
+import trashsoftware.decimalExpr.numbers.Complex;
 import trashsoftware.decimalExpr.numbers.Number;
 import trashsoftware.decimalExpr.numbers.Rational;
 
@@ -129,5 +130,17 @@ public class BuilderTest {
         Number res = decimalExpr.evaluate();
         System.out.println(res);
         Assertions.assertEquals(res, Rational.valueOf(220));
+    }
+
+    @Test
+    void testMacroFunctionWithShadowedVar() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("i+sum(i, 2i x, 0, 10)+i")
+                .variable("x")
+                .build();
+        decimalExpr.setVariable("x", 2);
+        Number res = decimalExpr.evaluate();
+        System.out.println(res);
+        Assertions.assertEquals(res, Complex.createComplex(220, 2));
     }
 }
