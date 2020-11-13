@@ -15,13 +15,18 @@ public class Decimal extends Real {
     /**
      * Static final field.
      */
-    public static final Decimal E = (Decimal) Decimal.fromDecimalString(
+    public static final Decimal PI = (Decimal) Decimal.fromDecimalString(
             "3.14159_26535_89793_23846_" +
                     "26433_83279_50288_41971_" +
                     "69399_37510_58209_74944_" +
                     "59230_78164_06286_20899_" +
                     "86280_34825_34211_70679");
-    public static final Decimal PI = new Decimal(BigDecimal.valueOf(Math.PI));
+    public static final Decimal E = (Decimal) Decimal.fromDecimalString(
+            "2.71828_18284_59045_23536_" +
+                    "02874_71352_66249_77572_" +
+                    "47093_69995_95749_66967_" +
+                    "62772_40766_30353_54759_" +
+                    "45713_82178_52516_64274");
 
     static final MathContext DEFAULT_CONTEXT = new MathContext(64, RoundingMode.HALF_UP);
 
@@ -46,6 +51,10 @@ public class Decimal extends Real {
 
     public static Real fromDecimalString(String value) {
         return createDecimal(new BigDecimal(value.replace(Number.SPLITTER_STRING, "")));
+    }
+
+    public static boolean bigDecimalEqualsZero(BigDecimal value) {
+        return value.compareTo(BigDecimal.ZERO) == 0;
     }
 
     @Override
@@ -170,9 +179,5 @@ public class Decimal extends Real {
     @Override
     public String toDecimalString() {
         return toString();
-    }
-
-    public static boolean bigDecimalEqualsZero(BigDecimal value) {
-        return value.compareTo(BigDecimal.ZERO) == 0;
     }
 }

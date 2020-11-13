@@ -28,6 +28,10 @@ public interface Number {
 
     Number pow(Number exp);
 
+    /**
+     * @param exp integer exponential
+     * @return the integer power of this number
+     */
     Number pow(int exp);
 
     Number sqrt();
