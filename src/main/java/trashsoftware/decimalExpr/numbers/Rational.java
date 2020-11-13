@@ -7,9 +7,6 @@ import java.util.Objects;
 
 public class Rational extends Real {
 
-    public static final char FRONT_REPEAT_CHAR = '{';
-    public static final char BACK_REPEAT_CHAR = '}';
-
     public static final Rational ZERO = Rational.fromBigInt(BigInteger.ZERO);
     public static final Rational ONE = Rational.fromBigInt(BigInteger.ONE);
     public static final Rational TWO = Rational.fromBigInt(BigInteger.TWO);
@@ -48,6 +45,7 @@ public class Rational extends Real {
      * @return new instance
      */
     public static Rational fromDecimalString(String decimal) {
+        decimal = decimal.replace(Number.SPLITTER_STRING, "");
         int pointIndex = decimal.indexOf('.');
         BigInteger numerator, denominator;  // 被除数和除数，可能不是最简
         if (pointIndex == -1) {  // it is an integer

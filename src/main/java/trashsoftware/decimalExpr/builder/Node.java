@@ -2,6 +2,7 @@ package trashsoftware.decimalExpr.builder;
 
 import trashsoftware.decimalExpr.BuildException;
 import trashsoftware.decimalExpr.expression.*;
+import trashsoftware.decimalExpr.numbers.Decimal;
 import trashsoftware.decimalExpr.numbers.Number;
 import trashsoftware.decimalExpr.numbers.Rational;
 
@@ -200,13 +201,22 @@ public abstract class Node {
     static class DecimalNode extends LeafExpr {
         final String literal;
 
-        DecimalNode(String literal, boolean approxRational) {
+        DecimalNode(String literal) {
             this.literal = literal;
         }
 
         @Override
         public Number eval(Values values) {
-            return null;
+            if (values.isApproxRational()) {
+                return Rational.fromDecimalString(literal);
+            } else {
+                return Decimal.fromDecimalString(literal);
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "DecimalNode{" + literal + '}';
         }
     }
 

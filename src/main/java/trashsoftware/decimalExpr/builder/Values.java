@@ -79,7 +79,7 @@ public abstract class Values {
     }
 
     public static class GlobalValues extends Values {
-        private boolean approxRational;
+        private boolean approxRational = true;
 
         @Override
         protected Macro innerGetMacro(String name) {

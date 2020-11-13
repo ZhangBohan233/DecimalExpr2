@@ -67,8 +67,7 @@ public class Parser {
             } else if (token instanceof Token.IntToken) {
                 astBuilder.addNode(new Node.IntNode(((Token.IntToken) token).literal));
             } else if (token instanceof Token.DecimalToken) {
-                astBuilder.addNode(new Node.DecimalNode(((Token.DecimalToken) token).literal,
-                        decimalExpr.isApproxRational()));
+                astBuilder.addNode(new Node.DecimalNode(((Token.DecimalToken) token).literal));
             } else {
                 throw new BuildException("Unexpected token " + token + ".");
             }

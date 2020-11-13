@@ -15,7 +15,12 @@ public class Decimal extends Real {
     /**
      * Static final field.
      */
-    public static final Decimal E = new Decimal(BigDecimal.valueOf(Math.E));
+    public static final Decimal E = (Decimal) Decimal.fromDecimalString(
+            "3.14159_26535_89793_23846_" +
+                    "26433_83279_50288_41971_" +
+                    "69399_37510_58209_74944_" +
+                    "59230_78164_06286_20899_" +
+                    "86280_34825_34211_70679");
     public static final Decimal PI = new Decimal(BigDecimal.valueOf(Math.PI));
 
     static final MathContext DEFAULT_CONTEXT = new MathContext(64, RoundingMode.HALF_UP);
@@ -37,6 +42,10 @@ public class Decimal extends Real {
     public static Real createDecimal(double value) {
         if (value == 0) return Rational.ZERO;
         else return new Decimal(BigDecimal.valueOf(value));
+    }
+
+    public static Real fromDecimalString(String value) {
+        return createDecimal(new BigDecimal(value.replace(Number.SPLITTER_STRING, "")));
     }
 
     @Override

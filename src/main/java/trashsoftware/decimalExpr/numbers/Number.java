@@ -2,6 +2,11 @@ package trashsoftware.decimalExpr.numbers;
 
 public interface Number {
 
+    char FRONT_REPEAT_CHAR = '{';
+    char BACK_REPEAT_CHAR = '}';
+    char SPLITTER = '_';
+    String SPLITTER_STRING = "_";
+
     /**
      * Returns {@code true} if this number is exact.
      * <p>

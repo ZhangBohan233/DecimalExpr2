@@ -1,5 +1,8 @@
 package trashsoftware.decimalExpr.builder;
 
+import trashsoftware.decimalExpr.BuildException;
+import trashsoftware.decimalExpr.numbers.Number;
+import trashsoftware.decimalExpr.numbers.Rational;
 import trashsoftware.decimalExpr.util.Utilities;
 
 import java.util.ArrayList;
@@ -147,6 +150,8 @@ public class Tokenizer {
         private static final int PLUS = 21;
         private static final int MINUS = 22;
         private static final int OTHER_ARITHMETIC = 23;
+        private static final int L_RECURRING_MARK = 24;
+        private static final int R_RECURRING_MARK = 25;
         private static final int UNDEFINED = 0;
 
         private static final int[] SELF_CONCATENATE = {
@@ -159,6 +164,10 @@ public class Tokenizer {
                 {UNDERSCORE, DIGIT},
                 {DIGIT, DOT},
                 {DOT, DIGIT},
+                {DOT, L_RECURRING_MARK},
+                {DIGIT, L_RECURRING_MARK},
+                {L_RECURRING_MARK, DIGIT},
+                {DIGIT, R_RECURRING_MARK},
                 {MINUS, GT},
                 {LT, MINUS},
                 {LETTER, DIGIT},
@@ -186,12 +195,17 @@ public class Tokenizer {
         private static int identify(char ch) {
             if (Character.isDigit(ch)) return DIGIT;
             else if (Character.isAlphabetic(ch)) return LETTER;
+//            else if (ch == Rational.FRONT_REPEAT_CHAR || ch == Rational.BACK_REPEAT_CHAR) return RECURRING_MARK;
 
             switch (ch) {
-                case '{':
-                    return L_BRACE;
-                case '}':
-                    return R_BRACE;
+                case Number.FRONT_REPEAT_CHAR:
+                    return L_RECURRING_MARK;
+                case Number.BACK_REPEAT_CHAR:
+                    return R_RECURRING_MARK;
+//                case '{':
+//                    return L_BRACE;
+//                case '}':
+//                    return R_BRACE;
                 case '(':
                     return L_BRACKET;
                 case ')':
@@ -250,11 +264,30 @@ public class Tokenizer {
         private static boolean isDecimal(String s) {
             int dotIndex = s.indexOf('.');
             if (dotIndex == -1) return false;
-            if (dotIndex == 0) return StringTypes.isInteger(s.substring(1));  // situation ".123"
+            if (dotIndex == 0) return StringTypes.isDecimalPart(s.substring(1));  // situation ".123"
             String[] parts = s.split("\\.");
             if (parts.length == 2) {
-                return StringTypes.isInteger(parts[0]) && StringTypes.isInteger(parts[1]);
+                return isInteger(parts[0]) && isDecimalPart(parts[1]);
             } else return false;
+        }
+
+        /**
+         * This function returns true iff {@code s} is the decimal place of a decimal number, i.e., part that
+         * follows the decimal point. Recurring notation is included.
+         *
+         * @param s number string
+         * @return returns true iff {@code s} is the decimal part of a decimal number
+         */
+        private static boolean isDecimalPart(String s) {
+            int lRecIndex = s.indexOf(Rational.FRONT_REPEAT_CHAR);
+            int rRecIndex = s.indexOf(Rational.BACK_REPEAT_CHAR);
+            if (lRecIndex == -1) {
+                if (rRecIndex != -1) throw new BuildException("Recurring interval not closed");
+                return isInteger(s);
+            }
+            if (rRecIndex == -1) throw new BuildException("Recurring interval not closed");
+            String middle = s.substring(lRecIndex + 1, rRecIndex);
+            return isInteger(middle);
         }
 
         public static boolean isIdentifier(String s) {

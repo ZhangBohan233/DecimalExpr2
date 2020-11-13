@@ -8,8 +8,6 @@ import trashsoftware.decimalExpr.numbers.Complex;
 import trashsoftware.decimalExpr.numbers.Number;
 import trashsoftware.decimalExpr.numbers.Rational;
 
-import java.util.Objects;
-
 public class BuilderTest {
 
     @Test
@@ -142,5 +140,57 @@ public class BuilderTest {
         Number res = decimalExpr.evaluate();
         System.out.println(res);
         Assertions.assertEquals(res, Complex.createComplex(220, 2));
+    }
+
+    @Test
+    void testDecimal() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("0.1234")
+                .approxRational(true)
+                .showAst()
+                .showTokens()
+                .build();
+        Number res = decimalExpr.evaluate();
+        System.out.println(res);
+    }
+
+    @Test
+    void testRecurringNumber() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("0.{142857}")
+                .showAst()
+                .showTokens()
+                .build();
+        Number res = decimalExpr.evaluate();
+        Assertions.assertEquals(res, Rational.fromFraction(1, 7));
+    }
+
+    @Test
+    void testRecurringNumberNotRational() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("0.{142857}")
+                .approxRational(false)
+                .build();
+        Assertions.assertThrows(NumberFormatException.class, decimalExpr::evaluate);
+    }
+
+    @Test
+    void testRationalWithUnderscore() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("123_45.333_444")
+                .approxRational(true)
+                .build();
+        Number res = decimalExpr.evaluate();
+        System.out.println(res);
+    }
+
+    @Test
+    void testDecimalWithUnderscore() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("123_45.333_444")
+                .approxRational(false)
+                .build();
+        Number res = decimalExpr.evaluate();
+        System.out.println(res);
     }
 }
