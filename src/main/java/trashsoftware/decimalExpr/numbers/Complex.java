@@ -150,6 +150,13 @@ public class Complex implements Number {
                 (real + "+" + imaginary + "i");
     }
 
+    @Override
+    public String toDecimalString() {
+        return real.signum() == 0 ?
+                (imaginary.equals(Rational.ONE) ? "i" : imaginary.toDecimalString() + "i") :
+                (real.toDecimalString() + "+" + imaginary.toDecimalString() + "i");
+    }
+
     private Number multiplyComplex(Complex other) {
         Real realPart = (Real) real.mul(other.real).sub(imaginary.mul(other.imaginary));  // ac - bd
         Real imPart = (Real) imaginary.mul(other.real).add(real.mul(other.imaginary));  // bc + ad

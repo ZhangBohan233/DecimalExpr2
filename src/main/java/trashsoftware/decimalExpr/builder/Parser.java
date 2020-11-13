@@ -53,9 +53,9 @@ public class Parser {
                 String identifier = ((Token.IdToken) token).identifier;
                 if (Utilities.arrayContains(Tokenizer.ALLOWED_OPERATORS, identifier)) {
                     proceedOperator(identifier, index - 1, astBuilder);
-                } else if (decimalExpr.getVarNames().contains(identifier)) {
+                } else if (decimalExpr.hasVariable(identifier)) {
                     astBuilder.addNode(new Node.VarNameNode(identifier));
-                } else if (decimalExpr.getMacroNames().contains(identifier)) {
+                } else if (decimalExpr.hasMacro(identifier)) {
                     astBuilder.addNode(new Node.MacroNameNode(identifier));
                 } else if (decimalExpr.getFunctions().containsKey(identifier)) {
                     //

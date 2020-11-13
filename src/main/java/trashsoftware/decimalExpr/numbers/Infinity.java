@@ -48,4 +48,9 @@ public enum Infinity implements Number {
     public String toString() {
         return this == POSITIVE_INFINITY ? "inf" : "-inf";
     }
+
+    @Override
+    public String toDecimalString() {
+        return toString();
+    }
 }

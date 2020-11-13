@@ -42,7 +42,7 @@ public class Functions {
 
             while (true) {
                 setValue(invariant, cur);
-                sum = sum.add(evalMacro(macro));
+                sum = sum.add(evalMacro());
                 if (cur.equals(stop)) break;
                 cur = cur.add(Rational.ONE);
             }

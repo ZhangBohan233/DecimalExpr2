@@ -273,6 +273,11 @@ public class Rational extends Real {
     }
 
     @Override
+    public String toDecimalString() {
+        return bigDecimalValue().toPlainString();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

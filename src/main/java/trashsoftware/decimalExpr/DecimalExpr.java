@@ -3,13 +3,13 @@ package trashsoftware.decimalExpr;
 import trashsoftware.decimalExpr.builder.*;
 import trashsoftware.decimalExpr.expression.*;
 import trashsoftware.decimalExpr.numbers.Complex;
+import trashsoftware.decimalExpr.numbers.NaN;
 import trashsoftware.decimalExpr.numbers.Number;
 import trashsoftware.decimalExpr.numbers.Rational;
 
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class DecimalExpr {
 
@@ -61,12 +61,12 @@ public class DecimalExpr {
         values.setVariable("i", Complex.I);
     }
 
-    private DecimalExpr(DecimalExpr parent) {
+    private DecimalExpr(DecimalExpr parent, Values subValues) {
         unaryOperators = parent.unaryOperators;
         binaryOperators = parent.binaryOperators;
         functions = parent.functions;
 
-        values = new Values.MacroValues(parent.values);
+        values = subValues;
 
         approxRational = parent.approxRational;
         root = null;
@@ -84,12 +84,20 @@ public class DecimalExpr {
         return functions;
     }
 
-    public Set<String> getVarNames() {
-        return values.varNames();
+//    public Set<String> getVarNames() {
+//        return values.varNames();
+//    }
+
+    public boolean hasVariable(String name) {
+        return values.hasVariable(name);
     }
 
-    public Set<String> getMacroNames() {
-        return values.macroNames();
+//    public Set<String> getMacroNames() {
+//        return values.macroNames();
+//    }
+
+    public boolean hasMacro(String name) {
+        return values.hasMacro(name);
     }
 
     public boolean isApproxRational() {
@@ -110,10 +118,12 @@ public class DecimalExpr {
 
     public void setMacro(String macroName, String macroContent) {
         if (values.hasMacro(macroName)) {
-            Builder subBuilder = new Builder(this);
+            Values subValues = new Values.MacroValues(values);
+            Builder subBuilder = new Builder(this, subValues);
             subBuilder.expression(macroContent);
             DecimalExpr subExpr = subBuilder.build();
-            Macro macro = new Macro(subExpr.root);
+            Macro macro = new Macro(subExpr.root, subValues);
+//            System.out.println(subExpr.root);
 
             values.setMacro(macroName, macro);
         } else {
@@ -136,8 +146,8 @@ public class DecimalExpr {
             decimalExpr = new DecimalExpr();
         }
 
-        private Builder(DecimalExpr parent) {
-            decimalExpr = new DecimalExpr(parent);
+        private Builder(DecimalExpr parent, Values subValues) {
+            decimalExpr = new DecimalExpr(parent, subValues);
         }
 
         public Builder expression(String expression) {
@@ -145,8 +155,10 @@ public class DecimalExpr {
             return this;
         }
 
-        public Builder variable(String var) {
-            decimalExpr.values.setVariable(var, null);
+        public Builder variable(String varName) {
+            if (varName == null || varName.length() == 0)
+                throw new BuildException("Name must not be empty");
+            decimalExpr.values.setVariable(varName, NaN.NaN);
             return this;
         }
 
@@ -185,7 +197,9 @@ public class DecimalExpr {
         }
 
         public Builder macro(String macroName) {
-            decimalExpr.values.setMacro(macroName, null);
+            if (macroName == null || macroName.length() == 0)
+                throw new BuildException("Name must not be empty");
+            decimalExpr.values.setMacro(macroName, Macro.UNDEFINED);
             return this;
         }
 

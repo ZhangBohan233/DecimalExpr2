@@ -167,6 +167,11 @@ public class Decimal extends Real {
         return value.toString();
     }
 
+    @Override
+    public String toDecimalString() {
+        return toString();
+    }
+
     public static boolean bigDecimalEqualsZero(BigDecimal value) {
         return value.compareTo(BigDecimal.ZERO) == 0;
     }

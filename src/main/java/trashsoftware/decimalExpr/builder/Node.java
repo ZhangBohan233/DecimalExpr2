@@ -165,7 +165,7 @@ public abstract class Node {
 
         @Override
         public Number eval(Values values) {
-            return values.getMacro(name).eval(values);
+            return values.getMacro(name).eval();
         }
     }
 
@@ -176,7 +176,7 @@ public abstract class Node {
 
         @Override
         public Number eval(Values values) {
-            throw new BuildException("Unexpected token " + name + ".");
+            throw new BuildException("Unexpected name " + name + ".");
         }
     }
 
@@ -266,11 +266,12 @@ public abstract class Node {
             }
             String name = ((NameNode) invariantNode).name;
 
+            Values.MacroValues macroValues = new Values.MacroValues(values);
             Node macroNode = args.get(1);
-            Macro macro = new Macro(macroNode);
+            Macro macro = new Macro(macroNode, macroValues);
 
             Number[] args = evalArgs(values);
-            return function.eval(values, name, macro, args);
+            return function.eval(name, macro, args);
         }
 
         private Number[] evalArgs(Values values) {

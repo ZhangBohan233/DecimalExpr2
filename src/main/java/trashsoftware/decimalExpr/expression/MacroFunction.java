@@ -5,7 +5,7 @@ import trashsoftware.decimalExpr.numbers.Number;
 
 public abstract class MacroFunction extends AbstractFunction {
 
-    protected Values subValues;
+    protected Macro macro;
 
     public MacroFunction(String name, int minArgCount, int maxArgCount) {
         super(name, minArgCount, maxArgCount);
@@ -15,7 +15,7 @@ public abstract class MacroFunction extends AbstractFunction {
         this(name, argCount, argCount);
     }
 
-    public Number eval(Values outerEnv, String invariant, Macro macro, Number... arguments) {
+    public Number eval(String invariant, Macro macro, Number... arguments) {
         if (arguments.length > maxArgCount || arguments.length < minArgCount) {
             throw new IllegalArgumentException(String.format("Function '%s' expects %s arguments, got %d.",
                     name,
@@ -23,7 +23,7 @@ public abstract class MacroFunction extends AbstractFunction {
                             String.valueOf(maxArgCount) : String.format("%d to %d", minArgCount, maxArgCount)),
                     arguments.length));
         }
-        subValues = new Values.MacroValues(outerEnv);
+        this.macro = macro;
         return evaluate(invariant, macro, arguments);
     }
 
@@ -48,17 +48,16 @@ public abstract class MacroFunction extends AbstractFunction {
      * @param value   value
      */
     protected void setValue(String varName, Number value) {
-        subValues.setVariable(varName, value);
+        macro.getMacroValues().setVariable(varName, value);
     }
 
     /**
      * Evaluate macro, using values that set by {@code setValue()}
      *
-     * @param macro the macro to be evaluated
      * @return the evaluation result
      */
-    protected Number evalMacro(Macro macro) {
-        return macro.eval(subValues);
+    protected Number evalMacro() {
+        return macro.eval();
     }
 
 //    protected Values getMacroValues() {

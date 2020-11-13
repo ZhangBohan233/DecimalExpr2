@@ -31,4 +31,6 @@ public interface Number {
     Number pow(int exp);
 
     Number sqrt();
+
+    String toDecimalString();
 }

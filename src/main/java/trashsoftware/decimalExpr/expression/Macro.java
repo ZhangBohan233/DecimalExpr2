@@ -1,23 +1,29 @@
 package trashsoftware.decimalExpr.expression;
 
+import trashsoftware.decimalExpr.BuildException;
 import trashsoftware.decimalExpr.builder.Node;
 import trashsoftware.decimalExpr.builder.Values;
 import trashsoftware.decimalExpr.numbers.Number;
 
 public class Macro {
 
-    private final Node root;
+    public static final Macro UNDEFINED = new Macro(null, null);
 
-    public Macro(Node root) {
+    private final Node root;
+    private final Values macroValues;
+
+    public Macro(Node root, Values macroValues) {
         this.root = root;
+        this.macroValues = macroValues;
     }
 
-//    public Node.BlockStmt getRoot() {
-//        return root;
-//    }
+    public Number eval() {
+        if (root == null) throw new BuildException("Macro is declared but not set.");
+        return root.eval(macroValues);
+    }
 
-    public Number eval(Values values) {
-        return root.eval(values);
+    public Values getMacroValues() {
+        return macroValues;
     }
 
     @Override

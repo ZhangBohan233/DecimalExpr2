@@ -55,11 +55,15 @@ public abstract class Values {
     }
 
     public boolean hasVariable(String varName) {
-        return variables.containsKey(varName);
+        return innerGetVariable(varName) != null;
     }
 
+//    public boolean hasLocalVariable(String varName) {
+//        return variables.containsKey(varName);
+//    }
+
     public boolean hasMacro(String macroName) {
-        return macros.containsKey(macroName);
+        return innerGetMacro(macroName) != null;
     }
 
     protected abstract Macro innerGetMacro(String name);

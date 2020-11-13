@@ -59,6 +59,39 @@ public class BuilderTest {
     }
 
     @Test
+    void testMacroOverride() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("x+2+m")
+                .variable("x")
+                .macro("m")
+                .build();
+        decimalExpr.setVariable("x", 4);
+        decimalExpr.setMacro("m", "x+1");
+        Number res = decimalExpr.evaluate();
+        Assertions.assertEquals(res, Rational.valueOf(11));
+        decimalExpr.setVariable("x", 5);
+        decimalExpr.setMacro("m", "x+x*2");
+        Number res2 = decimalExpr.evaluate();
+        Assertions.assertEquals(res2, Rational.valueOf(22));
+    }
+
+    @Test
+    void testMacroNested() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("x+2+m")
+                .variable("x")
+                .macro("m")
+                .macro("n")
+                .build();
+        decimalExpr.setVariable("x", 4);
+        decimalExpr.setMacro("m", "(2*n)+1+x");
+        decimalExpr.setMacro("n", "3x");
+        Number res = decimalExpr.evaluate();
+//        System.out.println(res);
+        Assertions.assertEquals(res, Rational.valueOf(35));
+    }
+
+    @Test
     void testUnary() {
         DecimalExpr decimalExpr = new DecimalExpr.Builder()
                 .expression("x^2+-2")
