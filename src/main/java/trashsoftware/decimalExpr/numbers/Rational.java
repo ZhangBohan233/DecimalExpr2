@@ -3,6 +3,8 @@ package trashsoftware.decimalExpr.numbers;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Rational extends Real {
@@ -274,7 +276,36 @@ public class Rational extends Real {
 
     @Override
     public String toDecimalString() {
-        return bigDecimalValue().toPlainString();
+        if (numerator.equals(BigInteger.ZERO)) return "0";
+
+        StringBuilder resultBuilder = new StringBuilder();
+        if (signum() < 0) resultBuilder.append('-');  // negative
+
+        BigInteger denom = denominator.abs();
+        BigInteger num = numerator.abs();
+        BigInteger[] dr = num.divideAndRemainder(denom);  // 'dr' always contains the remainder times ten
+        dr[1] = dr[1].multiply(BigInteger.TEN);
+        resultBuilder.append(dr[0]);
+        if (dr[1].equals(BigInteger.ZERO)) return resultBuilder.toString();
+
+        resultBuilder.append('.');
+        Map<BigInteger, Integer> map = new HashMap<>();
+        map.put(dr[1], resultBuilder.length());
+
+        while (!(dr = dr[1].divideAndRemainder(denom))[1].equals(BigInteger.ZERO)) {
+            resultBuilder.append(dr[0]);
+            dr[1] = dr[1].multiply(BigInteger.TEN);
+            Integer beg = map.get(dr[1]);
+            if (beg != null) {
+                String front = resultBuilder.substring(0, beg);
+                String back = resultBuilder.substring(beg);
+                return front + FRONT_REPEAT_CHAR + back + BACK_REPEAT_CHAR;
+            } else {
+                map.put(dr[1], resultBuilder.length());
+            }
+        }
+        if (!dr[0].equals(BigInteger.ZERO)) resultBuilder.append(dr[0]);
+        return resultBuilder.toString();
     }
 
     @Override

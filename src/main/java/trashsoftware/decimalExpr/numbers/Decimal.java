@@ -1,5 +1,7 @@
 package trashsoftware.decimalExpr.numbers;
 
+import trashsoftware.decimalExpr.util.Utilities;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -41,11 +43,13 @@ public class Decimal extends Real {
 
     public static Real createDecimal(BigDecimal value) {
         if (bigDecimalEqualsZero(value)) return Rational.ZERO;
+        if (Utilities.isIntegerValue(value)) return Rational.fromBigInt(value.toBigInteger());
         else return new Decimal(value);
     }
 
     public static Real createDecimal(double value) {
         if (value == 0) return Rational.ZERO;
+        else if (value == (long) value) return Rational.valueOf((long) value);
         else return new Decimal(BigDecimal.valueOf(value));
     }
 

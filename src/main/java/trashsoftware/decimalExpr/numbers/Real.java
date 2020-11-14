@@ -6,6 +6,10 @@ public abstract class Real implements Number, Comparable<Real> {
 
     public abstract BigDecimal bigDecimalValue();
 
+    public double doubleValue() {
+        return bigDecimalValue().doubleValue();
+    }
+
     public abstract Real neg();
 
     /**

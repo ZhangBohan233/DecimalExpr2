@@ -2,13 +2,30 @@ package trashsoftware.decimalExpr;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import trashsoftware.decimalExpr.builder.Tokenizer;
 import trashsoftware.decimalExpr.expression.BinaryOperator;
+import trashsoftware.decimalExpr.expression.Function;
 import trashsoftware.decimalExpr.expression.Operator;
-import trashsoftware.decimalExpr.numbers.Complex;
+import trashsoftware.decimalExpr.expression.UnaryOperator;
+import trashsoftware.decimalExpr.numbers.*;
 import trashsoftware.decimalExpr.numbers.Number;
-import trashsoftware.decimalExpr.numbers.Rational;
+import trashsoftware.decimalExpr.util.Calculations;
 
 public class BuilderTest {
+
+    Operator factorial = new UnaryOperator("!", Operator.PRECEDENCE_NEGATION, false) {
+        @Override
+        public Number eval(Number value) {
+            return Calculations.factorial((Rational) value);
+        }
+    };
+
+    Function cosine = new Function("cos", 1) {
+        @Override
+        protected Number evaluate(Number... arguments) {
+            return Decimal.createDecimal(Math.cos(((Real) arguments[0]).doubleValue()));
+        }
+    };
 
     @Test
     void testParser() {
@@ -208,6 +225,16 @@ public class BuilderTest {
     }
 
     @Test
+    void testRecurringNumberOutput() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("0.{142857}")
+                .build();
+        Number res = decimalExpr.evaluate();
+        Assertions.assertEquals(res, Rational.fromFraction(1, 7));
+        System.out.println(res.toDecimalString());
+    }
+
+    @Test
     void testRationalWithUnderscore() {
         DecimalExpr decimalExpr = new DecimalExpr.Builder()
                 .expression("123_45.333_444")
@@ -222,6 +249,26 @@ public class BuilderTest {
         DecimalExpr decimalExpr = new DecimalExpr.Builder()
                 .expression("123_45.333_444")
                 .approxRational(false)
+                .build();
+        Number res = decimalExpr.evaluate();
+        System.out.println(res);
+    }
+
+    @Test
+    void testCustomRightUnaryOperator() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("2+5!")
+                .operator(factorial)
+                .build();
+        Number res = decimalExpr.evaluate();
+        Assertions.assertEquals(res, Rational.valueOf(122));
+    }
+
+    @Test
+    void testCustomFunction() {
+        DecimalExpr decimalExpr = new DecimalExpr.Builder()
+                .expression("cos(0)")
+                .function(cosine)
                 .build();
         Number res = decimalExpr.evaluate();
         System.out.println(res);

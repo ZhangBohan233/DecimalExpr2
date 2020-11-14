@@ -2,10 +2,8 @@ package trashsoftware.decimalExpr;
 
 import trashsoftware.decimalExpr.builder.*;
 import trashsoftware.decimalExpr.expression.*;
-import trashsoftware.decimalExpr.numbers.Complex;
-import trashsoftware.decimalExpr.numbers.NaN;
+import trashsoftware.decimalExpr.numbers.*;
 import trashsoftware.decimalExpr.numbers.Number;
-import trashsoftware.decimalExpr.numbers.Rational;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -59,6 +57,8 @@ public class DecimalExpr {
         functions.putAll(BUILTIN_FUNCTIONS);
 
         values.setVariable("i", Complex.I);
+        values.setVariable("e", Decimal.E);
+        values.setVariable("pi", Decimal.PI);
     }
 
     private DecimalExpr(DecimalExpr parent, Values subValues) {
